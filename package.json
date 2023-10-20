@@ -1,0 +1,35 @@
+{
+	"name": "@sveltejs/adapter-cake",
+	"version": "1.0.0",
+	"description": "Adapter for Sveltekit to create comptatible builds for CakePHP",
+	"license": "MIT",
+	"type": "module",
+	"exports": {
+		".": {
+			"import": "./index.js"
+		},
+	},
+	"files": [
+		"index.js",
+		"index.d.ts",
+		"platforms.js",
+        "adapter.js"
+	],
+	"scripts": {
+		"lint": "prettier --check . --config ../../.prettierrc --ignore-path .gitignore",
+		"check": "tsc",
+		"format": "pnpm lint --write"
+	},
+	"devDependencies": {
+		"@playwright/test": "1.30.0",
+		"@sveltejs/kit": "^1.26.0",
+		"@types/node": "^16.18.6",
+		"sirv": "^2.0.3",
+		"svelte": "^4.0.5",
+		"typescript": "^4.9.4",
+		"vite": "^4.4.9"
+	},
+	"peerDependencies": {
+		"@sveltejs/kit": "^1.5.0"
+	}
+}
