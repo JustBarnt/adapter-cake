@@ -161,23 +161,23 @@ function injectIntoHeader(head, options){
     const children = head.children;
     //wipe out old tags
     Array.from(children).forEach(child => {if(child.tagName === 'LINK') child.remove()});
+    const jsPaths = jsFilesArray.map(file => `<link rel="modulepreload" href="/${options.routeName}/js/${file.moduleDir}/${file.fileName}">`);
+    const cssPaths  = cssFilesArray.map(file => `<link href="/${options.routeName}/css/${file}" rel="stylesheet">`);
 
 
-    const injectableData = 
+    let injectableData = 
     `
         <link rel="icon" href="/entry_validation/favicon.png" />
-		
-        ${cssFilesArray.map(cssFile => {
-            if(!cssFile.includes('_'))
-                `<link href="/${options.routeName}/css/${cssFile}" rel="stylesheet">`;
-        })}
-        
-        ${jsFilesArray.map(file => {
-            `<link rel="modulepreload" href="/${options.routeName}/js/${file.moduleDir}/${file.fileName}">`;
-        })}
     `;
+    
+    cssPaths.forEach(css => {
+        injectableData += css += "\n";
+    });
 
-    console.log(injectableData)
+    jsPaths.forEach(js => {
+        injectableData += js += "\n";
+    });
+
     head.insertAdjacentHTML('beforeend', injectableData);
 }
 
