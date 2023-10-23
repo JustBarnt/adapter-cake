@@ -13,8 +13,8 @@ const {readFile, writeFile } = $fs;
 
 /** @type {import('./index').AdapterOptions} */
 const defaultOptions = { 
-    pages:'build',
-    assets: 'build',
+    pages:'build', // Change to View/{$PluginName}
+    assets: 'build', // Change to webroot/[js|css] use glob to find all .css files and send them to css and same for js.
     fallback:'',
     precompress: false,
     minify: false,
