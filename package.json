@@ -1,5 +1,5 @@
 {
-	"name": "@sveltejs/adapter-cake",
+	"name": "adapter-cake",
 	"version": "1.0.0",
 	"description": "Adapter for Sveltekit to create comptatible builds for CakePHP",
 	"license": "MIT",
@@ -21,12 +21,8 @@
 		"format": "pnpm lint --write"
 	},
 	"dependencies": {
-		"@iarna/toml": "^2.2.5",
-		"cosmiconfig": "^8.3.6",
 		"html-minifier-terser": "^7.2.0",
 		"jsdom": "^22.1.0",
-		"json5": "^2.2.3",
-		"prettier": "^3.0.3",
 		"tiny-glob": "^0.2.9"
 	},
 	"devDependencies": {

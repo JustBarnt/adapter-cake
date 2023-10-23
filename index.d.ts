@@ -12,14 +12,6 @@ interface AdapterInjectsPositions {
     [afterEnd?: string]: string | string[];
 }
 
-export interface AdapterOptions {
-    pages?: string;
-    assets?: string[] | string;
-    fallback?: string;
-    precompress?: boolean;
-    strict?: boolean;
-}
-
 interface AdapterReplace {
     from: string;
     to: string;
@@ -27,16 +19,20 @@ interface AdapterReplace {
 }
 
 
-interface AdapterOptions {
-    assets?: string | string[];
-    fallback?: string;
-    injectTo: AdapterInjectsTarget;
-    minify?: boolean;
+export interface AdapterOptions {
+    assets?: string;
     pages?: string;
+    fallback?: string;
     precompress?: boolean;
-    prettify?: boolean;
     replace?: AdapterReplace[];
-    targetExtension: string;
+    injectTo?: AdapterInjectsTarget;
+    strict: boolean;
+    targetExtension?: string;
+    viewName: string;
+    moduleName: string;
+    routeName: string;
+    cssDirName: string;
+    jsDirName: string;
 }
 
 export default function plugin(options?: AdapterOptions): Adapter;
