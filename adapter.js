@@ -1,10 +1,11 @@
 import { basename, dirname, join, relative } from 'node:path';
 import { JSDOM } from 'jsdom';
-import { promises as $fs } from 'node:fs';
+import { promises as $fs, writeFileSync, readFileSync } from 'node:fs';
 import crypto from 'node:crypto';
 import glob from 'tiny-glob';
+import { dir } from 'node:console';
 
-const {readFile, writeFile, rename, mkdir, access } = $fs;
+const {readFile, writeFile, rename, mkdir } = $fs;
 const cssFilesArray = [];
 /** @type { {jsDirName:string, assets: string, appDir: string, rootDir: string, moduleDir: string, outputDir:string, fileName:string }[] | any[] } */
 const jsFilesArray = [];
@@ -82,7 +83,7 @@ export async function transformFiles(builder, userOptions ){
             
         }),
 
-        jsFiles.map(async (jsFile) => {
+        jsFiles.map(async (jsFile, index) => {
             const dirObj = {
                 jsDirName: userOptions.jsDirName ?? defaultOptions.jsDirName,
                 assets: userOptions.assets ?? defaultOptions.assets,
@@ -95,10 +96,19 @@ export async function transformFiles(builder, userOptions ){
 
             //Look into reading the JS Files and editing the CSS links there.
             const outFile = `${basename(jsFile, '.js')}.js`;
+
+            if (outFile.includes('app')) {
+                const jsContents = readFileSync(jsFile, 'utf-8');
+                const newJsContents = jsContents.replace(/\.\.\\\\assets\\\\/gi, '..\\\\..\\\\\css\\\\');
+                console.log(jsFile)
+                writeFileSync(join(jsFile), newJsContents);
+            }
             
             dirObj.fileName = outFile;
             dirObj.outputDir = join(dirObj.rootDir, dirObj.assets, dirObj.appDir, dirObj.jsDirName, dirObj.moduleDir);
             jsFilesArray.push(dirObj);
+
+            console.log('FileName:', dirObj.fileName)
             
             const oldPath = join(dirname(jsFile), outFile);
             const outPath = join(dirObj.outputDir, outFile);
@@ -111,7 +121,6 @@ export async function transformFiles(builder, userOptions ){
             } 
             finally {
                 await rename(oldPath, outPath);
-
             }
         }),
 
@@ -161,6 +170,8 @@ function injectIntoHeader(head, options){
     const children = head.children;
     //wipe out old tags
     Array.from(children).forEach(child => {if(child.tagName === 'LINK') child.remove()});
+
+    //Build an array of js/css files to append to our injectable data
     const jsPaths = jsFilesArray.map(file => `<link rel="modulepreload" href="/${options.routeName}/js/${file.moduleDir}/${file.fileName}">`);
     const cssPaths  = cssFilesArray.map(file => `<link href="/${options.routeName}/css/${file}" rel="stylesheet">`);
 
@@ -170,8 +181,10 @@ function injectIntoHeader(head, options){
         <link rel="icon" href="/entry_validation/favicon.png" />
     `;
     
-    cssPaths.forEach(css => {
-        injectableData += css += "\n";
+    cssPaths.forEach((css, index) => {
+        //Work around for Skipping _layout*.css and _page*.css as those are imported via app.js when the svetekit app loads
+        if(index < 2)
+            injectableData += css += "\n";
     });
 
     jsPaths.forEach(js => {
@@ -204,8 +217,8 @@ function replaceSvelteKitImports(body, options){
                                         const data = [null,null];
 
                                         Promise.all([
-                                                import('/${options.routeName}/entry/${entryFiles[1].fileName}'),
-                                                import('/${options.routeName}/entry/${entryFiles[0].fileName}')
+                                                import('/${options.routeName}/js/entry/${entryFiles[1].fileName}'),
+                                                import('/${options.routeName}/js/entry/${entryFiles[0].fileName}')
                                         ]).then(([kit, app]) => {
                                                 kit.start(app, element, {
                                                         node_ids: [0, 2],
